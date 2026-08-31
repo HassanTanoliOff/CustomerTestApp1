@@ -10,8 +10,8 @@
     {
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
-        public int TotalItems { get; set; }
-        public decimal TotalAmount { get; set; }
+        public int OrderItemsQuantity { get; set; }
+        public decimal OrderTotalPrice { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
 
 
@@ -22,9 +22,16 @@
         public int OrderId { get; set; }
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
-        public int ItemsTotal { get; set; }
+        public int ItemsQuantity { get; set; }
         public decimal TotalPrice { get; set; }
-        public string OrderStatus { get; set; }
+        public List<ProductsDto> Items { get; set; } = new();
+    }
+
+    public class ProductsDto
+    {
+        public int ProductId { get; set; }
+        public string Name { get; set; }
+        public int number { get; set; }
 
     }
 }

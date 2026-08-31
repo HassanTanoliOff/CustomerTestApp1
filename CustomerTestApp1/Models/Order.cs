@@ -1,6 +1,6 @@
 ﻿namespace CustomerTestApp1.Models
 {
-    public class Order
+    public class Order : ISoftDelete
     {
         public int OrderId { get; set; }
         public decimal TotalAmount { get; set; }
@@ -10,6 +10,8 @@
         public int CustomerId { get; set; }
         public Customer Customer { get; set; } = null!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public bool IsDeleted { get; set; }
+
     }
 
     public enum OrderStatus

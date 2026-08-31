@@ -2,7 +2,7 @@
 
 namespace CustomerTestApp1.Models
 {
-    public class Product
+    public class Product : ISoftDelete
     {
 
         public int Id { get; set; }
@@ -10,6 +10,7 @@ namespace CustomerTestApp1.Models
         public string Description { get; set; } = string.Empty;
         public int CategoryId { get; set; } = 1;
         public decimal Price { get; set; }
+        public bool IsDeleted { get; set; }
         public Inventory? Inventory { get; set; }
         public Category Category { get; set; } = null!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
@@ -21,11 +22,4 @@ namespace CustomerTestApp1.Models
             (Inventory?.StockQuantity ?? 0) >= minimumStock
             ? "In Stock" : "Out of Stock";
     }
-
-    //public enum StockAvailability
-    //{
-    //    OutOfStock = 0,
-    //    InStock = 1,
-
-    //}
 }

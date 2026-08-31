@@ -1,13 +1,15 @@
 ﻿using CustomerTestApp1.DTOS;
-using Microsoft.AspNetCore.Mvc;
+using CustomerTestApp1.Responses;
 
 namespace CustomerTestApp1.Services.Interfaces
 {
     public interface ICustomerService
     {
-        Task<ActionResult<IEnumerable<CustomerResponseDto>>> GetAllCustomersAsync();
-        Task<ActionResult<CustomerResponseDto>> AddCustomerAsync(CustomerCreationDto dto);
-        Task<ActionResult<CustomerUpdateDto>> UpdateCustomerAsync(int id, CustomerUpdateDto dto);
-        Task<ActionResult<bool>> DeleteCustomerAsync(int id);
+        Task<ResultData<CustomerResponseDto>> GetCustomerByIdAsync(int cId);
+        Task<ResultData<List<CustomerResponseDto>>> GetAllCustomersAsync();
+        Task<ResultData<CustomerResponseDto>> AddCustomerAsync(CustomerCreationDto dto);
+        Task<ResultData<CustomerResponseDto>> UpdateCustomerAsync(int id, CustomerUpdateDto dto);
+        Task<ResultData<bool>> DeleteCustomerAsync(int id);
+
     }
 }
