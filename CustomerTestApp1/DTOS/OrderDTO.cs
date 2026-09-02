@@ -14,7 +14,6 @@
         public decimal OrderTotalPrice { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
 
-
     }
 
     public class OrderListResponseDto
@@ -34,4 +33,14 @@
         public int number { get; set; }
 
     }
+
+    public class OrderUpdateDto
+    {
+        public OrdersController? Status { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public ICollection<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
+
+    }
+
 }

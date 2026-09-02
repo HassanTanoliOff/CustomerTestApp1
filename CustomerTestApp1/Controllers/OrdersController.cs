@@ -1,183 +1,92 @@
-using CustomerTestApp1.Data;
 using CustomerTestApp1.DTOS;
-using CustomerTestApp1.Models;
+using CustomerTestApp1.Responses;
+using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [Route("api/[controller]")]
 [ApiController]
 public class OrdersController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-    public OrdersController(ApplicationDbContext context)
+    private readonly IOrderService _service;
+    public OrdersController(IOrderService service)
     {
-        _context = context;
+        _service = service;
     }
+
 
     // GET: api/Order
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<OrderListResponseDto>>> GetOrder()
+    public async Task<ActionResult<List<OrderListResponseDto>>> GetAllOrders()
     {
-        return await _context.Orders
-            .Select(o => new OrderListResponseDto
-            {
-                OrderId = o.OrderId,
-                CustomerId = o.CustomerId,
-                CustomerName = $"{o.Customer.FirstName} {o.Customer.LastName}",
-                ItemsTotal = o.OrderItems.Sum(oi => oi.TotalNumber),
-                TotalPrice = o.TotalAmount,
-                OrderStatus = o.Status.ToString(),
-            })
-            .ToListAsync();
+        var result = await _service.GetAllOrdersAsync();
+
+        if (!result.Success)
+        {
+            return ApiErrorStatus.Response<List<OrderListResponseDto>>(result.ErrorType, result.Error);
+        }
+        return Ok(ApiResponse<List<OrderListResponseDto>>.SuccessResponse(result.Data, result.Message));
     }
 
-    // GET: api/Order/5
-    [HttpGet("{orderid}")]
-    public async Task<ActionResult<OrderResponseDto>> GetOrder(int orderid)
+    [HttpGet("{customerId:int}")]
+    public async Task<ActionResult<ApiResponse<List<OrderListResponseDto>>>> GetOrdersByCustomerId(int customerId)
     {
-        var orderResult = _context.Orders
-            .Select(o => new OrderResponseDto
-            {
-                OrderId = o.OrderId,
-                CustomerId = o.CustomerId,
-                TotalItems = o.OrderItems.Sum(o => o.TotalNumber),
-                TotalAmount = o.TotalAmount,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    ProductQuantity = oi.TotalNumber,
-                    Price = oi.Amount
-                }).ToList()
-            }).ToListAsync();
-        if (orderResult == null) return NotFound("No Orders yet");
+        var result = await _service.GetOrdersByCustomerIdAsync(customerId);
+        if (!result.Success)
+            return ApiErrorStatus.Response<List<OrderListResponseDto>>(result.ErrorType, result.Error);
 
-        return Ok(orderResult);
+        return Ok(ApiResponse<List<OrderListResponseDto>>.SuccessResponse(result.Data, result.Message));
     }
 
-    // PUT: api/Order/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{orderid}")]
-    public async Task<IActionResult> PutOrder(int? orderid, Order order)
+
+    //// GET: api/Order/5
+    [HttpGet("{customerId:int}/orders/{orderId:int}")]
+    public async Task<ActionResult<ApiResponse<OrderResponseDto>>> GetOrderByOrderId(int orderId, int customerId)
     {
-        if (orderid != order.OrderId)
-        {
-            return BadRequest();
-        }
+        var orderResult = await _service.GetOrderByOrderIdAsync(orderId, customerId);
 
-        _context.Entry(order).State = EntityState.Modified;
+        if (!orderResult.Success)
+            return ApiErrorStatus.Response<OrderResponseDto>(orderResult.ErrorType, orderResult.Error);
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!OrderExists(orderid))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        return Ok(ApiResponse<OrderResponseDto>.SuccessResponse(orderResult.Data, orderResult.Message));
     }
 
     // POST: api/Order
     [HttpPost]
-    public async Task<ActionResult<OrderCreationDto>> AddOrder([FromBody] OrderCreationDto order)
+    public async Task<ActionResult<ApiResponse<OrderResponseDto>>> AddOrder([FromBody] OrderCreationDto order)
     {
-        if (!ModelState.IsValid) return BadRequest("Something Went Wrong");
-
-        var customerExists = _context.Customers.Find(order.CustomerId);
-        if (customerExists == null)
-            return NotFound("Invalid Customer ID");
-
-        if (!order.Items.Any())
-            return BadRequest("No Items add to Order");
-
-        var productsIds = order.Items.Select(i => i.ProductId).Distinct().ToList();
-
-        var products = await _context.Products
-            .Where(p => productsIds.Contains(p.Id))
-            .ToListAsync();
+        var result = await _service.AddNewOrderAsync(order);
+        if (!result.Success)
+            return ApiErrorStatus.Response<OrderResponseDto>(result.ErrorType, result.Error);
 
 
-        var productLookUp = products.ToDictionary(p => p.Id);
-
-        var orderItems = new List<OrderItem>();
-        decimal totalAmount = 0;
-        int totalNumberOfItems = 0;
-        foreach (var item in order.Items)
-        {
-            var product = productLookUp[item.ProductId];
-            var unitPrice = product.Price;
-            totalNumberOfItems += item.ProductQuantity;
-            totalAmount += unitPrice * item.ProductQuantity;
-
-            orderItems.Add(
-            new OrderItem
-            {
-                TotalNumber = item.ProductQuantity,
-                ProductId = item.ProductId,
-                Amount = unitPrice * item.ProductQuantity,
-
-            });
-        }
-
-
-        var newOrder = new Order
-        {
-            CustomerId = order.CustomerId,
-            TotalAmount = totalAmount,
-            OrderItems = orderItems,
-            Status = OrderStatus.Pending
-        };
-
-        _context.Orders.Add(newOrder);
-        await _context.SaveChangesAsync();
-
-        var result = new OrderResponseDto
-        {
-            OrderId = newOrder.OrderId,
-            CustomerId = newOrder.CustomerId,
-            TotalItems = totalNumberOfItems,
-            TotalAmount = newOrder.TotalAmount,
-            Items = newOrder.OrderItems.Select(oi => new OrderItemDto
-            {
-                ProductId = oi.ProductId,
-                ProductName = productLookUp[oi.ProductId].Name,
-                ProductQuantity = oi.TotalNumber,
-                Price = productLookUp[oi.ProductId].Price
-
-            }).ToList(),
-        };
-
-        return Ok(result);
+        return Ok(ApiResponse<OrderResponseDto>.SuccessResponse(result.Data, result.Message));
     }
 
-    // DELETE: api/Order/5
-    [HttpDelete("{orderid}")]
-    public async Task<IActionResult> DeleteOrder(int? orderid)
+
+    // patch
+    [HttpPatch("{customerId:int}/orders/{orderId:int}")]
+    public async Task<ActionResult<ApiResponse<string>>> UpdateOrder(int orderId, int customerId, [FromBody] OrderUpdateDto order)
     {
-        var order = await _context.Orders.FindAsync(orderid);
+        var result = await _service.UpdateOrderAsync(orderId, customerId, order);
 
-        if (order == null)
-        {
-            return NotFound();
-        }
+        if (!result.Success)
+            return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);
 
-        _context.Orders.Remove(order);
-        await _context.SaveChangesAsync();
+        return Ok(ApiResponse<string>.SuccessResponse(result.Data, result.Message));
 
-        return NoContent();
     }
 
-    private bool OrderExists(int? orderid)
+
+
+    [HttpDelete("{customerId}/orders/{orderId}")]
+    public async Task<ActionResult<ApiResponse<string>>> DeleteOrder(int orderId, int customerId)
     {
-        return _context.Orders.Any(e => e.OrderId == orderid);
+        var result = await _service.DeletedOrderAsync(orderId, customerId);
+        if (!result.Success)
+            return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);
+
+        return Ok(ApiResponse<string>.SuccessResponse(result.Data, result.Message));
     }
+
+
 }

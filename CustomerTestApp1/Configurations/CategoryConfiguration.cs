@@ -13,6 +13,7 @@ namespace CustomerTestApp1.Configurations
 
             builder.Property(c => c.CategoryName)
                 .IsRequired()
+                .HasMaxLength(50)
                 .HasMaxLength(50);
 
             builder.Property(c => c.CreatedAt)
