@@ -18,6 +18,10 @@ namespace CustomerTestApp1.Configurations
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd();
 
+            builder.Property(i => i.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
+
             builder.HasOne(i => i.Product)
                 .WithOne(p => p.Inventory)
                 .HasForeignKey<Inventory>(i => i.ProductId)

@@ -72,32 +72,65 @@ namespace CustomerTestApp1.Services
         }
         public async Task<ResultData<CustomerResponseDto>> AddCustomerAsync(CustomerCreationDto dto)
         {
+            // First check customer is already created or not 
 
-            var newCustomer = new Customer
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                PhoneNumber = dto.PhoneNumber,
-                Email = dto.Email,
-                Address = dto.Address,
-            };
+            var exists = await _context.Customers.AsNoTracking().AnyAsync(c => c.Email == dto.Email);
+            if (exists)
+                return ResultData<CustomerResponseDto>.Fail("User already exits.", ResultErrorType.Validation);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-
-                _context.Customers.Add(newCustomer);
-                await _context.SaveChangesAsync();
-
-                var result = new CustomerResponseDto
+                var newCustomer = new Customer
                 {
-                    CustomerId = newCustomer.CostumerId,
-                    FirstName = newCustomer.FirstName,
-                    LastName = newCustomer.LastName,
-                    PhoneNumber = newCustomer.PhoneNumber,
-                    Email = newCustomer.Email,
-                    Address = newCustomer.Address,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName ?? "",
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber ?? "",
+                    Address = dto.Address ?? "No address added",
+                    DateCreated = DateTime.UtcNow
                 };
 
-                return ResultData<CustomerResponseDto>.Pass(result, "User Created");
+                await _context.Customers.AddAsync(newCustomer);
+                await _context.SaveChangesAsync();
+
+                var newUser = new User
+                {
+
+                };
+
+
+                //}
+                //catch (Exception ex)
+                //{
+
+                //}
+
+                //var newCustomer = new Customer
+                //{
+                //    FirstName = dto.FirstName,
+                //    LastName = dto.LastName,
+                //    PhoneNumber = dto.PhoneNumber,
+                //    Email = dto.Email,
+                //    Address = dto.Address,
+                //};
+                //try
+                //{
+
+                //    _context.Customers.Add(newCustomer);
+                //    await _context.SaveChangesAsync();
+
+                //    var result = new CustomerResponseDto
+                //    {
+                //        CustomerId = newCustomer.CostumerId,
+                //        FirstName = newCustomer.FirstName,
+                //        LastName = newCustomer.LastName,
+                //        PhoneNumber = newCustomer.PhoneNumber,
+                //        Email = newCustomer.Email,
+                //        Address = newCustomer.Address,
+                //    };
+
+                return ResultData<CustomerResponseDto>.Pass(new CustomerResponseDto(), "User Created");
             }
             catch (Exception ex)
             {

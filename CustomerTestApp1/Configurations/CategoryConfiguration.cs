@@ -20,6 +20,9 @@ namespace CustomerTestApp1.Configurations
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd();
 
+            builder.Property(c => c.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
 
             builder.HasData(
                 new Category { Id = 1, CategoryName = "UnCategorized", CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }

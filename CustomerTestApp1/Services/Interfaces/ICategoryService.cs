@@ -6,8 +6,8 @@ namespace CustomerTestApp1.Services.Interfaces
     public interface ICategoryService
     {
         Task<ResultData<List<CategoriesResponseDto>>> GetAllCategoriesAsync();
-        Task<ResultData<CategoriesResponseDto>> AddNewCategoryAsync(string categoryName);
-        Task<ResultData<string>> UpdateCategoryAsync(int categoryId);
+        Task<ResultData<CategoriesResponseDto>> AddNewCategoryAsync(CategoriesCreationDto dto);
+        Task<ResultData<string>> UpdateCategoryAsync(int categoryId, CategoryUpdateDto dto);
         Task<ResultData<string>> DeleteCategoryAsync(int categoryId);
     }
 }

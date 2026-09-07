@@ -16,6 +16,7 @@ namespace CustomerTestApp1.Data
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Inventory> Inventory => Set<Inventory>();
+        public DbSet<User> Users => Set<User>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -15,6 +15,14 @@ namespace CustomerTestApp1.DTOS
         [EmailAddress(ErrorMessage = "Email Must be of Valid Format")]
         public string Email { get; set; } = null!;
         public string? Address { get; set; }
+        [Display(Name = "PassWord")]
+        [Required(ErrorMessage = "Password Is required to register")]
+        public string Password { get; set; } = null!;
+
+        [Display(Name = "Confirm PassWord")]
+        [Required(ErrorMessage = "Confirm PassWord is Required.")]
+        [Compare(nameof(Password), ErrorMessage = "Password does not match.")]
+        public string ConfirmPassword { get; set; } = null!;
     }
 
     public class CustomerUpdateDto

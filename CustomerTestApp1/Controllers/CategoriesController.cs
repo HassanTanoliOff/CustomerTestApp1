@@ -1,56 +1,63 @@
-
-using CustomerTestApp1.Data;
+using CustomerTestApp1.DTOS;
+using CustomerTestApp1.Responses;
+using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
 public class CategoriesController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-    public CategoriesController(ApplicationDbContext context)
+    private readonly ICategoryService _service;
+    public CategoriesController(ICategoryService service)
     {
-        _context = context;
+        _service = service;
     }
 
     // GET: api/Category
     [HttpGet]
-    public Task GetCategory()
+    public async Task<ActionResult<ApiResponse<List<CategoriesResponseDto>>>> GetAllCategories()
     {
-        return Task.CompletedTask;
+        var result = await _service.GetAllCategoriesAsync();
+        if (!result.Success)
+            return ApiErrorStatus.Response<List<CategoriesResponseDto>>(result.ErrorType, result.Error);
+
+        return Ok(ApiResponse<List<CategoriesResponseDto>>.SuccessResponse(result.Data, result.Message));
     }
 
-    // GET: api/Category/5
-    [HttpGet("{id}")]
-    public Task GetCategory(int id)
-    {
-        return Task.CompletedTask;
-    }
-
-    // PUT: api/Category/5
-    [HttpPut("{id}")]
-    public Task PutCategory(int? id)
-    {
-        return Task.CompletedTask;
-    }
 
     // POST: api/Category
     [HttpPost]
-    public Task PostCategory()
+    public async Task<ActionResult<ApiResponse<CategoriesResponseDto>>> AddNewCategory([FromBody] CategoriesCreationDto dto)
     {
+        var result = await _service.AddNewCategoryAsync(dto);
+        if (!result.Success)
+            return ApiErrorStatus.Response<CategoriesResponseDto>(result.ErrorType, result.Error);
 
+        return StatusCode(201, ApiResponse<CategoriesResponseDto>.SuccessResponse(result.Data, result.Message));
 
-        return Task.CompletedTask;
     }
+
+    // PUT: api/Category/5
+    [HttpPatch("{cId:int}")]
+    public async Task<ActionResult<ApiResponse<string>>> UpdateCategory(int cId, [FromBody] CategoryUpdateDto dto)
+    {
+        var result = await _service.UpdateCategoryAsync(cId, dto);
+        if (!result.Success)
+            return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);
+
+        return Ok(ApiResponse<string>.SuccessResponse(result.Data, result.Message));
+    }
+
 
     // DELETE: api/Category/5
-    [HttpDelete("{id}")]
-    public Task DeleteCategory(int? id)
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<ApiResponse<string>>> DeleteCategory(int id)
     {
-        return Task.CompletedTask;
+        var result = await _service.DeleteCategoryAsync(id);
+        if (!result.Success)
+            return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);
+
+        return Ok(ApiResponse<string>.SuccessResponse(result.Data, result.Message));
     }
 
-    private Task CategoryExists(int? id)
-    {
-        return Task.CompletedTask;
-    }
 }

@@ -1,10 +1,11 @@
-﻿using CustomerTestApp1.Responses;
+﻿using CustomerTestApp1.DTOS;
+using CustomerTestApp1.Responses;
 
 namespace CustomerTestApp1.Services.Interfaces
 {
     public interface IInventoryService
     {
-        Task<ResultData<string>> GetInventoryAsync();
-        Task<ResultData<string>> GetInventoryByFilters(string condition);
+        Task<ResultData<List<InventoryResponseDto>>> GetInventoryAsync();
+        //Task<ResultData<IQueryable<InventoryResponseDto>>> GetInventoryByFilters(string condition);
     }
 }

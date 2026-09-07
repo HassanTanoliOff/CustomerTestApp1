@@ -13,6 +13,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

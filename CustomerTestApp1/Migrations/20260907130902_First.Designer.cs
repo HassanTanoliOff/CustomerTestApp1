@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CustomerTestApp1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260827071134_fixCustomerTable")]
-    partial class fixCustomerTable
+    [Migration("20260907130902_First")]
+    partial class First
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,11 @@ namespace CustomerTestApp1.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryName")
@@ -59,7 +64,8 @@ namespace CustomerTestApp1.Migrations
                             Id = 1,
                             CategoryName = "UnCategorized",
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false
+                            IsDeleted = false,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -129,6 +135,11 @@ namespace CustomerTestApp1.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
@@ -263,6 +274,74 @@ namespace CustomerTestApp1.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("CustomerTestApp1.Models.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("CustomerTestApp1.Models.Inventory", b =>
                 {
                     b.HasOne("CustomerTestApp1.Models.Product", "Product")
@@ -315,6 +394,16 @@ namespace CustomerTestApp1.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("CustomerTestApp1.Models.User", b =>
+                {
+                    b.HasOne("CustomerTestApp1.Models.Customer", "Customer")
+                        .WithOne("User")
+                        .HasForeignKey("CustomerTestApp1.Models.User", "CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("CustomerTestApp1.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -323,6 +412,8 @@ namespace CustomerTestApp1.Migrations
             modelBuilder.Entity("CustomerTestApp1.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CustomerTestApp1.Models.Order", b =>
