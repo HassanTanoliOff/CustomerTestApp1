@@ -1,58 +1,60 @@
 ﻿using CustomerTestApp1.DTOS;
 using CustomerTestApp1.Responses;
 using CustomerTestApp1.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 
 [Route("api/[controller]")]
 [ApiController]
 public class CustomersController(ICustomerService service) : ControllerBase
 {
-    private readonly ICustomerService _service = service;
+  private readonly ICustomerService _service = service;
 
-    [HttpGet]
-    public async Task<ActionResult<ApiResponse<List<CustomerResponseDto>>>> GetAll()
-    {
-        var result = await _service.GetAllCustomersAsync();
-        if (!result.Success)
-            return ApiErrorStatus.Response<List<CustomerResponseDto>>(result.ErrorType, result.Error);
+  [Authorize(Roles = "Admin")]
+  [HttpGet]
+  public async Task<ActionResult<ApiResponse<List<CustomerResponseDto>>>> GetAll()
+  {
+    var result = await _service.GetAllCustomersAsync();
+    if (!result.Success)
+      return ApiErrorStatus.Response<List<CustomerResponseDto>>(result.ErrorType, result.Error);
 
+    return Ok(ApiResponse<List<CustomerResponseDto>>.SuccessResponse(result.Data, result.Message));
+  }
 
-        return Ok(ApiResponse<List<CustomerResponseDto>>.SuccessResponse(result.Data, result.Message));
-    }
+  [HttpPost]
+  public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> AddCustomer(
+    [FromBody] CustomerCreationDto customer
+  )
+  {
+    var result = await _service.AddCustomerAsync(customer);
+    if (!result.Success)
+      return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
 
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> AddCustomer([FromBody] CustomerCreationDto customer)
-    {
-        var result = await _service.AddCustomerAsync(customer);
-        if (!result.Success)
-            return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
+    return Ok(ApiResponse<CustomerResponseDto>.SuccessResponse(result.Data, result.Message));
+  }
 
-        return Ok(ApiResponse<CustomerResponseDto>.SuccessResponse(result.Data));
+  [Authorize]
+  [HttpPatch("{id:int}")]
+  public async Task<ActionResult<ApiResponse<CustomerUpdateDto>>> UpdateCustomer(
+    int id,
+    [FromBody] CustomerUpdateDto customerDto
+  )
+  {
+    var result = await _service.UpdateCustomerAsync(id, customerDto);
+    if (!result.Success)
+      return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
 
+    return Ok(ApiResponse<CustomerResponseDto>.SuccessResponse(result.Data, result.Message));
+  }
 
-    }
-    [HttpPatch("{id:int}")]
-    public async Task<ActionResult<ApiResponse<CustomerUpdateDto>>> UpdateCustomer(int id, [FromBody] CustomerUpdateDto customerDto)
-    {
-        var result = await _service.UpdateCustomerAsync(id, customerDto);
-        if (!result.Success)
-            return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
+  [Authorize]
+  [HttpDelete("{id:int}")]
+  public async Task<ActionResult<ApiResponse<bool>>> DeleteCustomer(int id)
+  {
+    var result = await _service.DeleteCustomerAsync(id);
+    if (!result.Success)
+      return ApiErrorStatus.Response<bool>(result.ErrorType, result.Error);
 
-        return Ok(ApiResponse<CustomerResponseDto>.SuccessResponse(result.Data));
-
-    }
-
-    [HttpDelete("{id:int}")]
-    public async Task<ActionResult<ApiResponse<bool>>> DeleteCustomer(int id)
-    {
-        var result = await _service.DeleteCustomerAsync(id);
-        if (!result.Success)
-            return ApiErrorStatus.Response<bool>(result.ErrorType, result.Error);
-
-        return Ok(ApiResponse<bool>.SuccessResponse(true, "Customer Deleted SuccessFully"));
-    }
-
+    return Ok(ApiResponse<bool>.SuccessResponse(result.Data, result.Message));
+  }
 }
-
-

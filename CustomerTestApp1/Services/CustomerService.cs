@@ -3,13 +3,15 @@ using CustomerTestApp1.DTOS;
 using CustomerTestApp1.Models;
 using CustomerTestApp1.Responses;
 using CustomerTestApp1.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomerTestApp1.Services
 {
-    public class CustomerService(ApplicationDbContext context) : ICustomerService
+    public class CustomerService(ApplicationDbContext context, IPasswordHasher<User> passHasher) : ICustomerService
     {
         private readonly ApplicationDbContext _context = context;
+        private readonly IPasswordHasher<User> _passWordHasher = passHasher;
 
         public async Task<ResultData<CustomerResponseDto>> GetCustomerByIdAsync(int cId)
         {
@@ -96,41 +98,40 @@ namespace CustomerTestApp1.Services
 
                 var newUser = new User
                 {
+                    Id = new Guid(),
+                    Name = $"{newCustomer.FirstName} {newCustomer.LastName}",
+                    Email = newCustomer.Email,
+                    Phone = newCustomer.PhoneNumber,
+                    Role = UserRole.User,
+                    IsActive = true,
+                    IsDeleted = false,
+                    CustomerId = newCustomer.CostumerId,
+                    DateCreated = DateTime.UtcNow,
+                    DateUpdated = DateTime.UtcNow
 
                 };
 
+                var hashedPass = _passWordHasher.HashPassword(newUser, dto.Password);
+                newUser.PasswordHash = hashedPass;
 
-                //}
-                //catch (Exception ex)
-                //{
+                await _context.Users.AddAsync(newUser);
+                await _context.SaveChangesAsync();
 
-                //}
+                await transaction.CommitAsync();
 
-                //var newCustomer = new Customer
-                //{
-                //    FirstName = dto.FirstName,
-                //    LastName = dto.LastName,
-                //    PhoneNumber = dto.PhoneNumber,
-                //    Email = dto.Email,
-                //    Address = dto.Address,
-                //};
-                //try
-                //{
+                var response = new CustomerResponseDto
+                {
+                    CustomerId = newCustomer.CostumerId,
+                    UserId = newUser.Id.ToString(),
+                    FirstName = newCustomer.FirstName,
+                    LastName = newCustomer.LastName,
+                    Email = newCustomer.Email,
+                    PhoneNumber = newCustomer.PhoneNumber,
+                    Address = newCustomer.Address,
 
-                //    _context.Customers.Add(newCustomer);
-                //    await _context.SaveChangesAsync();
+                };
 
-                //    var result = new CustomerResponseDto
-                //    {
-                //        CustomerId = newCustomer.CostumerId,
-                //        FirstName = newCustomer.FirstName,
-                //        LastName = newCustomer.LastName,
-                //        PhoneNumber = newCustomer.PhoneNumber,
-                //        Email = newCustomer.Email,
-                //        Address = newCustomer.Address,
-                //    };
-
-                return ResultData<CustomerResponseDto>.Pass(new CustomerResponseDto(), "User Created");
+                return ResultData<CustomerResponseDto>.Pass(response, "User Created");
             }
             catch (Exception ex)
             {

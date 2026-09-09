@@ -18,11 +18,6 @@ namespace CustomerTestApp1.DTOS
         [Display(Name = "PassWord")]
         [Required(ErrorMessage = "Password Is required to register")]
         public string Password { get; set; } = null!;
-
-        [Display(Name = "Confirm PassWord")]
-        [Required(ErrorMessage = "Confirm PassWord is Required.")]
-        [Compare(nameof(Password), ErrorMessage = "Password does not match.")]
-        public string ConfirmPassword { get; set; } = null!;
     }
 
     public class CustomerUpdateDto
@@ -36,12 +31,13 @@ namespace CustomerTestApp1.DTOS
 
     public class CustomerResponseDto
     {
-        public int CustomerId { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public int? CustomerId { get; set; }
+        public string? UserId { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public string Address { get; set; } = string.Empty;
+        public string? Address { get; set; }
     }
 
 }

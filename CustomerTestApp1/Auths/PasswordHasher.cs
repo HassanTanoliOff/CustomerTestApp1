@@ -3,21 +3,25 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CustomerTestApp1.Auths
 {
-    public class PasswordHasher : IPasswordHasher
+
+    public class PassWordHasher : IPasswordHasher<User>
     {
-        public string Hash(string password)
+        private readonly PasswordHasher<User> _hasher = new PasswordHasher<User>();
+        public string HashPassword(User user, string password)
         {
-            var hasher = new PasswordHasher<User>();
+            //var hasher = new PasswordHasher<User>();
+            // return a sting 
+            return _hasher.HashPassword(user, password);
 
 
+        }
 
-            return "";
+        public PasswordVerificationResult VerifyHashedPassword(User user, string hashedPassword, string providedPassword)
+        {
+            //var hasher = new PasswordHasher<User>();
+            /// return a Enumerable of password varification result 
+            return _hasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
+
         }
     }
-
-    public interface IPasswordHasher
-    {
-        string Hash(string password);
-    }
-
 }
