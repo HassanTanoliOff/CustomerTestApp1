@@ -97,6 +97,14 @@ builder.Services.AddSwaggerGen(c =>
   });
 });
 
+builder.Services.AddCors(options =>
+{
+  options.AddPolicy(
+    "AllowBlazorUI",
+    policy => policy.WithOrigins("http://localhost:5266").AllowAnyHeader().AllowAnyMethod()
+  );
+});
+
 var app = builder.Build();
 
 await DbSeeder.SeedAdminAsync(app.Services);
@@ -111,6 +119,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowBlazorUi");
 app.MapControllers();
 
 app.Run();

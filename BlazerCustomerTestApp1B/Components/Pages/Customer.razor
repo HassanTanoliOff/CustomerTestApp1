@@ -1,0 +1,115 @@
+﻿@page "/customers"
+@using BlazerCustomerTestApp1B.Services
+@inject CustomerService CustomerService
+@using CustomerTestApp1.DTOS
+
+@if (errorMessage is not null)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+<h3>Customers</h3>
+
+@if (customers is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in customers)
+            {
+                <tr>
+                    <td>@c.CustomerId</td>
+                    <td>@c.FirstName</td>
+                    <td>@c.LastName</td>
+                    <td>@c.Email</td>
+                    <td>@c.PhoneNumber</td>
+                    <td><button class="btn btn-danger" @onclick="() => Delete(c.CustomerId)">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h4>Add Customer</h4>
+<EditForm Model="newCustomer" OnValidSubmit="Create">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>First Name</label>
+        <InputText @bind-Value="newCustomer.FirstName" />
+    </div>
+    <div>
+        <label>Last Name</label>
+        <InputText @bind-Value="newCustomer.LastName" />
+    </div>
+    <div>
+        <label>Email</label>
+        <InputText @bind-Value="newCustomer.Email" />
+    </div>
+    <div>
+        <label>Phone</label>
+        <InputText @bind-Value="newCustomer.PhoneNumber" />
+    </div>
+    <div>
+        <label>Address</label>
+        <InputText @bind-Value="newCustomer.Address" />
+    </div>
+    <div>
+        <label>Password</label>
+        <InputText @bind-Value="newCustomer.Password" type="password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@code {
+    private List<CustomerResponseDto>? customers;
+    private CustomerCreationDto newCustomer = new();
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var (data, error) = await CustomerService.GetAllAsync();
+        customers = data;
+        errorMessage = error;
+    }
+
+    private async Task Create()
+    {
+        var (success, error) = await CustomerService.CreateAsync(newCustomer);
+        if (!success)
+        {
+            errorMessage = error;
+            return;
+        }
+        errorMessage = null;
+        newCustomer = new();
+        var (data, _) = await CustomerService.GetAllAsync();
+        customers = data;
+    }
+
+    private async Task Delete(int? id)
+    {
+        if (id is null) return;
+        var (success, error) = await CustomerService.DeleteAsync(id.Value);
+        errorMessage = success ? null : error;
+        if (success)
+        {
+            var (data, _) = await CustomerService.GetAllAsync();
+            customers = data;
+        }
+    }
+}

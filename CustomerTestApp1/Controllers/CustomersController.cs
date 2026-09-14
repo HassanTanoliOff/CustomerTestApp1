@@ -10,7 +10,7 @@ public class CustomersController(ICustomerService service) : ControllerBase
 {
   private readonly ICustomerService _service = service;
 
-  [Authorize(Roles = "Admin")]
+  //[Authorize(Roles = "Admin")]
   [HttpGet]
   public async Task<ActionResult<ApiResponse<List<CustomerResponseDto>>>> GetAll()
   {
