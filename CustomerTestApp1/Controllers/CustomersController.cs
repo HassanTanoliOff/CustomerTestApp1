@@ -21,6 +21,7 @@ public class CustomersController(ICustomerService service) : ControllerBase
     return Ok(ApiResponse<List<CustomerResponseDto>>.SuccessResponse(result.Data, result.Message));
   }
 
+  // // Add file upload to customer
   [HttpPost]
   public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> AddCustomer(
     [FromBody] CustomerCreationDto customer
