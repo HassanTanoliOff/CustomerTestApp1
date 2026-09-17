@@ -4,36 +4,31 @@ using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CustomerTestApp1.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class OrdersController : ControllerBase
-{
+public class OrdersController : ControllerBase {
   private readonly IOrderService _service;
 
-  public OrdersController(IOrderService service)
-  {
+  public OrdersController(IOrderService service) {
     _service = service;
   }
 
   // GET: api/Order
   [HttpGet]
-  public async Task<ActionResult<List<OrderListResponseDto>>> GetAllOrders()
-  {
+  public async Task<ActionResult<List<OrderListResponseDto>>> GetAllOrders() {
     var result = await _service.GetAllOrdersAsync();
 
-    if (!result.Success)
-    {
-      return ApiErrorStatus.Response<List<OrderListResponseDto>>(result.ErrorType, result.Error);
-    }
+    if (!result.Success) return ApiErrorStatus.Response<List<OrderListResponseDto>>(result.ErrorType, result.Error);
     return Ok(ApiResponse<List<OrderListResponseDto>>.SuccessResponse(result.Data, result.Message));
   }
 
   [HttpGet("{customerId:int}")]
   public async Task<ActionResult<ApiResponse<List<OrderListResponseDto>>>> GetOrdersByCustomerId(
     int customerId
-  )
-  {
+  ) {
     var result = await _service.GetOrdersByCustomerIdAsync(customerId);
     if (!result.Success)
       return ApiErrorStatus.Response<List<OrderListResponseDto>>(result.ErrorType, result.Error);
@@ -46,8 +41,7 @@ public class OrdersController : ControllerBase
   public async Task<ActionResult<ApiResponse<OrderResponseDto>>> GetOrderByOrderId(
     int orderId,
     int customerId
-  )
-  {
+  ) {
     var orderResult = await _service.GetOrderByOrderIdAsync(orderId, customerId);
 
     if (!orderResult.Success)
@@ -60,8 +54,7 @@ public class OrdersController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<ApiResponse<OrderResponseDto>>> AddOrder(
     [FromBody] OrderCreationDto order
-  )
-  {
+  ) {
     var result = await _service.AddNewOrderAsync(order);
     if (!result.Success)
       return ApiErrorStatus.Response<OrderResponseDto>(result.ErrorType, result.Error);
@@ -75,8 +68,7 @@ public class OrdersController : ControllerBase
     int orderId,
     int customerId,
     [FromBody] OrderUpdateDto order
-  )
-  {
+  ) {
     var result = await _service.UpdateOrderAsync(orderId, customerId, order);
 
     if (!result.Success)
@@ -86,8 +78,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpDelete("{customerId}/orders/{orderId}")]
-  public async Task<ActionResult<ApiResponse<string>>> DeleteOrder(int orderId, int customerId)
-  {
+  public async Task<ActionResult<ApiResponse<string>>> DeleteOrder(int orderId, int customerId) {
     var result = await _service.DeletedOrderAsync(orderId, customerId);
     if (!result.Success)
       return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);

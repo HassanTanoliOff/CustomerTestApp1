@@ -1,16 +1,10 @@
-﻿namespace CustomerTestApp1.DTOS
-{
-    public class UserCreationDto
-    {
+﻿namespace CustomerTestApp1.DTOS;
 
-    }
+public class UserCreationDto {
+}
 
-    public class UserUpdateDto
-    {
+public class UserUpdateDto {
+}
 
-    }
-    public class UserResponseDto
-    {
-
-    }
+public class UserResponseDto {
 }

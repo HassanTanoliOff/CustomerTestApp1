@@ -1,7 +1,7 @@
 ﻿@page "/customers"
 @using BlazerCustomerTestApp1B.Services
-@inject CustomerService CustomerService
 @using CustomerTestApp1.DTOS
+@inject CustomerService CustomerService
 
 @if (errorMessage is not null)
 {
@@ -17,59 +17,61 @@ else
 {
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th></th>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th></th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var c in customers)
-            {
-                <tr>
-                    <td>@c.CustomerId</td>
-                    <td>@c.FirstName</td>
-                    <td>@c.LastName</td>
-                    <td>@c.Email</td>
-                    <td>@c.PhoneNumber</td>
-                    <td><button class="btn btn-danger" @onclick="() => Delete(c.CustomerId)">Delete</button></td>
-                </tr>
-            }
+        @foreach (var c in customers)
+        {
+            <tr>
+                <td>@c.CustomerId</td>
+                <td>@c.FirstName</td>
+                <td>@c.LastName</td>
+                <td>@c.Email</td>
+                <td>@c.PhoneNumber</td>
+                <td>
+                    <button class="btn btn-danger" @onclick="() => Delete(c.CustomerId)">Delete</button>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
 
 <h4>Add Customer</h4>
 <EditForm Model="newCustomer" OnValidSubmit="Create">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
 
     <div>
         <label>First Name</label>
-        <InputText @bind-Value="newCustomer.FirstName" />
+        <InputText @bind-Value="newCustomer.FirstName"/>
     </div>
     <div>
         <label>Last Name</label>
-        <InputText @bind-Value="newCustomer.LastName" />
+        <InputText @bind-Value="newCustomer.LastName"/>
     </div>
     <div>
         <label>Email</label>
-        <InputText @bind-Value="newCustomer.Email" />
+        <InputText @bind-Value="newCustomer.Email"/>
     </div>
     <div>
         <label>Phone</label>
-        <InputText @bind-Value="newCustomer.PhoneNumber" />
+        <InputText @bind-Value="newCustomer.PhoneNumber"/>
     </div>
     <div>
         <label>Address</label>
-        <InputText @bind-Value="newCustomer.Address" />
+        <InputText @bind-Value="newCustomer.Address"/>
     </div>
     <div>
         <label>Password</label>
-        <InputText @bind-Value="newCustomer.Password" type="password" />
+        <InputText @bind-Value="newCustomer.Password" type="password"/>
     </div>
 
     <button type="submit" class="btn btn-primary">Create</button>
@@ -95,8 +97,9 @@ else
             errorMessage = error;
             return;
         }
+
         errorMessage = null;
-        newCustomer = new();
+        newCustomer = new CustomerCreationDto();
         var (data, _) = await CustomerService.GetAllAsync();
         customers = data;
     }
@@ -112,4 +115,5 @@ else
             customers = data;
         }
     }
+
 }

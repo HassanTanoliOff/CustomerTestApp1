@@ -1,0 +1,10 @@
+  [mcp_servers.rider]
+    command = "C:\\Users\\QBCPC\\AppData\\Local\\Programs\\Rider\\bin\\rider64.exe"
+    args = ["stdioMcpServer"]
+
+    [mcp_servers.rider.env]
+      IJ_MCP_SERVER_PORT = "64482"
+
+
+
+

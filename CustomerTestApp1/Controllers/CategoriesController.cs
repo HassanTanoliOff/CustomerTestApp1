@@ -4,22 +4,21 @@ using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CustomerTestApp1.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class CategoriesController : ControllerBase
-{
+public class CategoriesController : ControllerBase {
   private readonly ICategoryService _service;
 
-  public CategoriesController(ICategoryService service)
-  {
+  public CategoriesController(ICategoryService service) {
     _service = service;
   }
 
   // GET: api/Category
   [HttpGet]
-  public async Task<ActionResult<ApiResponse<List<CategoriesResponseDto>>>> GetAllCategories()
-  {
+  public async Task<ActionResult<ApiResponse<List<CategoriesResponseDto>>>> GetAllCategories() {
     var result = await _service.GetAllCategoriesAsync();
     if (!result.Success)
       return ApiErrorStatus.Response<List<CategoriesResponseDto>>(result.ErrorType, result.Error);
@@ -34,8 +33,7 @@ public class CategoriesController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<ApiResponse<CategoriesResponseDto>>> AddNewCategory(
     [FromBody] CategoriesCreationDto dto
-  )
-  {
+  ) {
     var result = await _service.AddNewCategoryAsync(dto);
     if (!result.Success)
       return ApiErrorStatus.Response<CategoriesResponseDto>(result.ErrorType, result.Error);
@@ -52,8 +50,7 @@ public class CategoriesController : ControllerBase
   public async Task<ActionResult<ApiResponse<string>>> UpdateCategory(
     int cId,
     [FromBody] CategoryUpdateDto dto
-  )
-  {
+  ) {
     var result = await _service.UpdateCategoryAsync(cId, dto);
     if (!result.Success)
       return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);
@@ -64,8 +61,7 @@ public class CategoriesController : ControllerBase
   // DELETE: api/Category/5
   [Authorize(Roles = "Admin")]
   [HttpDelete("{id:int}")]
-  public async Task<ActionResult<ApiResponse<string>>> DeleteCategory(int id)
-  {
+  public async Task<ActionResult<ApiResponse<string>>> DeleteCategory(int id) {
     var result = await _service.DeleteCategoryAsync(id);
     if (!result.Success)
       return ApiErrorStatus.Response<string>(result.ErrorType, result.Error);

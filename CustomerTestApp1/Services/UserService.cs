@@ -1,6 +1,4 @@
-﻿namespace CustomerTestApp1.Services
-{
-    public class UserService
-    {
-    }
+﻿namespace CustomerTestApp1.Services;
+
+public class UserService {
 }

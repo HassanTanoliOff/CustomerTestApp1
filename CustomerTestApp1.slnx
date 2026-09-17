@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="BlazerCustomerTestApp1B/BlazerCustomerTestApp1B.csproj" Id="766f99d1-9c11-4adf-bbc9-de5c61cc5906" />
-  <Project Path="CustomerTestApp1/CustomerTestApp1.csproj" />
+    <Project Path="BlazerCustomerTestApp1B/BlazerCustomerTestApp1B.csproj" Id="766f99d1-9c11-4adf-bbc9-de5c61cc5906"/>
+    <Project Path="CustomerTestApp1/CustomerTestApp1.csproj"/>
 </Solution>

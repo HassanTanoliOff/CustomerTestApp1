@@ -8,19 +8,13 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient(
   "CustomerTestApp1",
-  client =>
-  {
-    client.BaseAddress = new Uri("http://localhost:5174/");
-  }
+  client => { client.BaseAddress = new Uri("http://localhost:5174/"); }
 );
 builder.Services.AddScoped<CustomerService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-  app.UseExceptionHandler("/Error", createScopeForErrors: true);
-}
+if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error", true);
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseAntiforgery();
 

@@ -4,21 +4,20 @@ using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CustomerTestApp1.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class InventoriesController : ControllerBase
-{
+public class InventoriesController : ControllerBase {
   private readonly IInventoryService _service;
 
-  public InventoriesController(IInventoryService service)
-  {
+  public InventoriesController(IInventoryService service) {
     _service = service;
   }
 
   [Authorize(Roles = "Admin")]
   [HttpGet]
-  public async Task<ActionResult<ApiResponse<List<InventoryResponseDto>>>> GetInventory()
-  {
+  public async Task<ActionResult<ApiResponse<List<InventoryResponseDto>>>> GetInventory() {
     var result = await _service.GetInventoryAsync();
 
     if (!result.Success)

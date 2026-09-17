@@ -4,23 +4,22 @@ using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CustomerTestApp1.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ProductsController : ControllerBase
-{
+public class ProductsController : ControllerBase {
   private readonly IProductService _service;
 
-  public ProductsController(IProductService service)
-  {
+  public ProductsController(IProductService service) {
     _service = service;
   }
 
   // GET: api/Product
   [AllowAnonymous]
   [HttpGet]
-  public async Task<ActionResult<ApiResponse<List<ProductResponseDto>>>> GetAllProducts()
-  {
+  public async Task<ActionResult<ApiResponse<List<ProductResponseDto>>>> GetAllProducts() {
     var result = await _service.GetAllProductsAsync();
     if (!result.Success)
       return ApiErrorStatus.Response<List<ProductResponseDto>>(result.ErrorType, result.Error);
@@ -30,8 +29,7 @@ public class ProductsController : ControllerBase
 
   // GET: api/Product/5
   [HttpGet("{id}")]
-  public async Task<ActionResult<ApiResponse<ProductResponseDto>>> GetProductById(int id)
-  {
+  public async Task<ActionResult<ApiResponse<ProductResponseDto>>> GetProductById(int id) {
     var result = await _service.GetProductByIdAsync(id);
     if (!result.Success)
       return ApiErrorStatus.Response<ProductResponseDto>(result.ErrorType, result.Error);
@@ -43,8 +41,7 @@ public class ProductsController : ControllerBase
   [HttpPost]
   public async Task<ActionResult<ApiResponse<ProductResponseDto>>> AddProduct(
     [FromBody] ProductCreationDto dto
-  )
-  {
+  ) {
     var result = await _service.AddNewProductAsync(dto);
     if (!result.Success)
       return ApiErrorStatus.Response<ProductResponseDto>(result.ErrorType, result.Error);
@@ -57,8 +54,7 @@ public class ProductsController : ControllerBase
   public async Task<ActionResult<ApiResponse<ProductResponseDto>>> UpdateProduct(
     int id,
     [FromBody] ProductUpdateDto dto
-  )
-  {
+  ) {
     var result = await _service.UpdateProductAsync(id, dto);
 
     if (!result.Success)
@@ -70,8 +66,7 @@ public class ProductsController : ControllerBase
   [Authorize(Roles = "Admin")]
   // DELETE: api/Product/5
   [HttpDelete("{id}")]
-  public async Task<ActionResult<ApiResponse<bool>>> DeleteProduct(int id)
-  {
+  public async Task<ActionResult<ApiResponse<bool>>> DeleteProduct(int id) {
     var result = await _service.DeleteProductAsync(id);
 
     if (!result.Success)

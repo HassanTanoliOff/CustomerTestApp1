@@ -4,16 +4,16 @@ using CustomerTestApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CustomerTestApp1.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
-public class CustomersController(ICustomerService service) : ControllerBase
-{
+public class CustomersController(ICustomerService service) : ControllerBase {
   private readonly ICustomerService _service = service;
 
   //[Authorize(Roles = "Admin")]
   [HttpGet]
-  public async Task<ActionResult<ApiResponse<List<CustomerResponseDto>>>> GetAll()
-  {
+  public async Task<ActionResult<ApiResponse<List<CustomerResponseDto>>>> GetAll() {
     var result = await _service.GetAllCustomersAsync();
     if (!result.Success)
       return ApiErrorStatus.Response<List<CustomerResponseDto>>(result.ErrorType, result.Error);
@@ -24,9 +24,8 @@ public class CustomersController(ICustomerService service) : ControllerBase
   // // Add file upload to customer
   [HttpPost]
   public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> AddCustomer(
-    [FromBody] CustomerCreationDto customer
-  )
-  {
+    [FromForm] CustomerCreationDto customer
+  ) {
     var result = await _service.AddCustomerAsync(customer);
     if (!result.Success)
       return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
@@ -36,11 +35,10 @@ public class CustomersController(ICustomerService service) : ControllerBase
 
   [Authorize]
   [HttpPatch("{id:int}")]
-  public async Task<ActionResult<ApiResponse<CustomerUpdateDto>>> UpdateCustomer(
+  public async Task<ActionResult<ApiResponse<CustomerResponseDto>>> UpdateCustomer(
     int id,
-    [FromBody] CustomerUpdateDto customerDto
-  )
-  {
+    [FromForm] CustomerUpdateDto customerDto
+  ) {
     var result = await _service.UpdateCustomerAsync(id, customerDto);
     if (!result.Success)
       return ApiErrorStatus.Response<CustomerResponseDto>(result.ErrorType, result.Error);
@@ -50,8 +48,7 @@ public class CustomersController(ICustomerService service) : ControllerBase
 
   [Authorize]
   [HttpDelete("{id:int}")]
-  public async Task<ActionResult<ApiResponse<bool>>> DeleteCustomer(int id)
-  {
+  public async Task<ActionResult<ApiResponse<bool>>> DeleteCustomer(int id) {
     var result = await _service.DeleteCustomerAsync(id);
     if (!result.Success)
       return ApiErrorStatus.Response<bool>(result.ErrorType, result.Error);
